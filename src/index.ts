@@ -32,13 +32,10 @@ process.argv.filter((a, b) => b > 1).forEach(a => {
     }
 });
 
-if (!libraries) { libraries = ['errors', 'notifications'] }
-if (!project) { project = ['site'] }
-
 if (!Object.keys(pckg.devDependencies).includes('@angular/cli')) {
     console.error('Could not find @angular/cli in package.json');
-} else if (project.length === 0 && libraries.length === 0) {
+} else if ((project || []).length === 0 && (libraries || []).length === 0) {
     console.error('There is no project and library to compile specified.');
 } else {
-    new ProcessList(libraries, project);
+    new ProcessList(libraries || [], project || []);
 };
