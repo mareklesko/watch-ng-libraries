@@ -9,6 +9,7 @@ export class ProcessList extends Array<IProcess>
 {
     constructor(libraries: Array<string>, projects: Array<string>) {
         super();
+        console.log(libraries, projects);
         libraries.forEach(x => this.push(new WatchProcess(x)));
         projects.forEach(x => this.push(new ServeProcess(x)));
 
@@ -38,6 +39,9 @@ export class ProcessList extends Array<IProcess>
             }
         });
 
+        if (this.filter(x => x.Type === 'Watch').length === 0) {
+            this.filter(x => x.Type === 'Serve').forEach((x, index) => x.start(4200 + index));
+        }
 
     }
 }

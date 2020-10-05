@@ -20,7 +20,7 @@ export class ServeProcess implements IProcess {
 
     public start(port: number = 0): any {
         this.Port = port;
-        this.Spawn = childProcess.spawn('ng', ['serve', this.Name, `--port ${port}`], { cwd: 'C:\\Source\\Repos\\Iridium\\Modules\\ANG', shell: true });
+        this.Spawn = childProcess.spawn('ng', ['serve', this.Name, `--port ${port}`], { shell: true });
         this.Spawn.addListener("error", (err) => console.error(err));
         this.Spawn.stdout.on("data", (data) => this.process_status(data));
         this.Spawn.stderr.on("data", (data) => this.process_status(data));

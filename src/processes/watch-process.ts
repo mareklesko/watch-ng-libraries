@@ -19,7 +19,7 @@ export class WatchProcess implements IProcess {
     }
 
     public start(): any {
-        this.Spawn = childProcess.spawn('ng', ['build', this.Name, '--watch'], { cwd: 'C:\\Source\\Repos\\Iridium\\Modules\\ANG', shell: true });
+        this.Spawn = childProcess.spawn('ng', ['build', this.Name, '--watch'], { shell: true });
         this.Spawn.addListener("error", (err) => console.error(err));
         this.Spawn.stdout.on("data", (data) => this.process_status(data));
         this.Spawn.stderr.on("data", (data) => this.process_status(data));
