@@ -10,7 +10,7 @@ let nextitem: string | null, libraries, project;
 
 // parse command-line arguments.
 process.argv.filter((a, b) => b > 1).forEach(a => {
-    if (a.includes('-')) {
+    if (a.startsWith('-')) {
         switch (a.toLowerCase()) {
             case '-l':
                 nextitem = 'libraries';
@@ -24,21 +24,12 @@ process.argv.filter((a, b) => b > 1).forEach(a => {
     } else {
         if (nextitem === 'libraries') {
             libraries = eval(a);
-            if (!Array.isArray(libraries)) { libraries = [libraries]; }
-        } else if (nextitem === 'project') {
-            if (a.includes('[')) {
-                project = eval(a);
-            } else {
-                project = a;
-            }
-            if (!Array.isArray(project)) { project = [project]; }
+        }
+        if (nextitem === 'project') {
+            project = eval(a);
         }
     }
 });
-
-if ((project || []).length === 0) {
-    project
-}
 
 console.log('Watch NG Libraries CLI utility, (c) 2020');
 
