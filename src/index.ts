@@ -57,3 +57,5 @@ function getDir(dir: string) {
     // ret.forEach(f => console.log(f));
     // ret.filter(s => s.isDirectory).forEach(d => getDir(path.join(dir, d.name)));
 }
+
+const regex = /@NgModule\(\{([\s|\S]*)\}\)[\s|\S]*export class (.*)\{/gmi;
