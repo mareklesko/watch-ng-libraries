@@ -53,7 +53,7 @@ getDir(path.join("C:/Source/Repos/Iridium/Modules/ANG/projects/errors/src"));
 
 function getDir(dir: string) {
     let ret;
-    ret = fs.readdirSync(dir, { withFileTypes: true });
-    ret.forEach(f => console.log(f));
+    ret = fs.readdir(dir, { withFileTypes: true }, (err, files) => console.log(files));
+    // ret.forEach(f => console.log(f));
     // ret.filter(s => s.isDirectory).forEach(d => getDir(path.join(dir, d.name)));
 }
