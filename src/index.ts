@@ -8,7 +8,8 @@ import path from "path";
 import { withLatestFrom } from "rxjs/operators";
 import { AngularParser } from "./angular/angular.parser";
 
-const defaultpath = "/home/marek/Iridium/Modules/ANG";
+// const defaultpath = "/home/marek/Iridium/Modules/ANG";
+const defaultpath = "C:/Source/Repos/Iridium/Modules/ANG";
 const pckg = jsonfile.readFileSync("./package.json");
 
 let nextitem: string | null, libraries: any, project: any;

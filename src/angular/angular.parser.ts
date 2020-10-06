@@ -1,20 +1,99 @@
 import jsonfile from "jsonfile";
 import path from "path";
 import fs from "fs";
+import { AngularModule } from "./angular.module.parser";
+import { AngularProject } from "./angular.project";
 
 const regex = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gim;
+const regexBody = /((imports|declarations|bootstrap|entryComponents)\:[\s|\S]*?\[[\s|\S]*?\][\,|\n])/gim;
+const regexImports = /(import\ (.*|\n)?\ from\ (.*)?\;+)/gim;
+const regexImportsMl = /(import[\s|\S]*?\;|(?=\n.*?;|\z))/gim;
 
 export class AngularParser {
+  public Modules = new Array<AngularModule>();
   public Structure: any = {};
   public Levels: any = {};
+  public Projects = new Array<AngularProject>();
+
   constructor(private Path: string) {
     const ang = jsonfile.readFileSync(path.join(this.Path, "angular.json"));
     this.parse(ang);
   }
 
+  sanitize() {
+    let allModules = new Array<string>();
+    this.Projects.forEach(p => {
+      allModules = allModules.concat(
+        p.Modules.map(x => x.Name));
+    });
+
+    allModules = allModules.filter(
+      (item: any, i: any, ar: string | any[]) => ar.indexOf(item) === i
+    )
+
+    this.Projects.forEach(p => {
+      p.Modules.forEach(m => {
+        m.Imports.forEach(i => {
+          if (!allModules.includes(i)) {
+            m.Imports = m.Imports.filter(x => x !== i);
+          }
+        })
+      })
+    })
+    this.createDependecies();
+
+    const levels: any = {};
+    this.getParent(this.Projects.find(x => x.Name === 'dash') as AngularProject, 10, levels);
+    const l = Object.keys(levels)
+      .map(x => ({ name: x, level: levels[x].level }))
+      .sort((a, b) => {
+        if (a.level < b.level) { return -1 }
+        if (a.level > b.level) { return 1 }
+        return 0;
+      }).map(x => x.name)
+    console.log(JSON.stringify(l));
+    // console.log(JSON.stringify(this.Projects.find(x => x.Name === 'dash'), null, 2));
+  }
+
+  createDependecies() {
+    this.Projects.forEach(p => {
+      p.Modules.forEach(m => {
+        m.Imports.forEach(i => {
+          const pr = this.getModule(i);
+          if (pr.project) {
+            // (pr.project as any).Children.push(p);
+            p.Parents.push((pr.project as any));
+          }
+        })
+      })
+    })
+  }
+
+  getModule(name: string) {
+    let project: AngularProject | null = null;
+    let module: AngularModule | null = null;
+    this.Projects.forEach(p => {
+      p.Modules.forEach(m => {
+        if (m.Name === name) {
+          module = m;
+          project = p;
+        }
+      })
+    })
+    return { module, project }
+  }
+
   parse(ang: any) {
+    Object.keys(ang.projects).forEach(key => {
+      this.Projects.push(
+        new AngularProject(key, path.join(this.Path, ang.projects[key].sourceRoot), ang.projects[key].projectType)
+      )
+    })
+
+    this.sanitize();
+    // console.log(JSON.stringify(this.Projects, null, 2));
+
     const projects = Object.keys(ang.projects)
-      .filter((key) => key !== "bi")
       .map((key) => ({
         name: key,
         root: ang.projects[key].sourceRoot,
@@ -87,7 +166,7 @@ export class AngularParser {
         parent: a.parent,
         children: new Array<any>(),
       }));
-    // .filter((a) => a.parent.length !== 0 || a.children.length !== 0);
+
     sorted.forEach((s: any, index, array: Array<any>) => {
       s.parent.forEach((p: any) => {
         array.find((x: any) => x.name === p.name).children.push(s);
@@ -98,10 +177,10 @@ export class AngularParser {
     //   .filter((x) => x.parent.length === 0)
     //   .forEach((x) => this.getChildren(x, 0));
 
-    this.getParent(
-      sorted.find((x) => x.name === "site"),
-      10
-    );
+    // this.getParent(
+    //   sorted.find((x) => x.name === "bi"),
+    //   10
+    // );
 
     const l = Object.keys(this.Levels)
       .map((x) => ({ name: x, level: this.Levels[x].level }))
@@ -114,7 +193,7 @@ export class AngularParser {
         }
         return 0;
       });
-    console.log(JSON.stringify(l));
+    console.log(JSON.stringify(l, null, 2));
   }
 
   getChildren(obj: any, level: number) {
@@ -130,16 +209,16 @@ export class AngularParser {
     }
   }
 
-  getParent(obj: any, level: number) {
-    if (!this.Levels[obj.name]) {
-      this.Levels[obj.name] = { level };
+  getParent(obj: AngularProject, level: number, levels: any) {
+    if (!levels[obj.Name]) {
+      levels[obj.Name] = { level };
     }
-    if (this.Levels[obj.name].level > level) {
-      this.Levels[obj.name].level = level;
+    if (levels[obj.Name].level > level) {
+      levels[obj.Name].level = level;
     }
-    if (obj.parent.length > 0) {
-      obj.parent.forEach((p: any) => {
-        this.getParent(p, level - 1);
+    if (obj.Parents.length > 0) {
+      obj.Parents.forEach((p: any) => {
+        this.getParent(p, level - 1, levels);
       });
     }
   }
@@ -152,6 +231,7 @@ export class AngularParser {
       } else {
         const ff = fs.readFileSync(path.join(dir, f.name)).toString();
         const ret = regex.exec(ff);
+        this.Modules.push(new AngularModule(ff));
         if (ret) {
           if (ret[1]) {
             imports.push(ret[1]);
