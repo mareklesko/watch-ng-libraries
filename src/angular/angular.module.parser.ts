@@ -10,19 +10,11 @@ export class AngularModule {
     public Name: string = "";
 
     constructor(body: string) {
-
-
         let m;
         while ((m = moduleParser.exec(body)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
             if (m.index === moduleParser.lastIndex) {
                 moduleParser.lastIndex++;
             }
-
-            // The result can be accessed through the `m`-variable.
-            m.forEach((match, groupIndex) => {
-                // console.log(`Found match, group ${groupIndex}: ${match}`);
-            });
 
             this.Name = m[2].trim();
             this.Imports = this.Imports.concat(m[1]

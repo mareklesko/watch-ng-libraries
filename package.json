@@ -1,13 +1,14 @@
 {
   "name": "@mareklesko/watch-ng-libraries",
-  "version": "0.4.2",
+  "version": "0.9.9-pre1",
   "description": "CLI to run ng apps using monorepo libraries",
   "main": "./lib/index.js",
   "bin": {
     "watch-ng-libraries": "./lib/index.js"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "debug": "node --nolazy ./lib/index.js serve dash"
   },
   "repository": {
     "type": "git",
@@ -27,7 +28,10 @@
   },
   "homepage": "https://github.com/mareklesko/watch-ng-libraries#readme",
   "dependencies": {
+    "colors": "^1.4.0",
+    "commander": "^6.1.0",
     "jsonfile": "^6.0.1",
+    "rimraf": "^3.0.2",
     "rxjs": "^6.6.3"
   },
   "devDependencies": {

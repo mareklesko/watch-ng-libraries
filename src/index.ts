@@ -3,54 +3,69 @@
 import process from "process";
 import jsonfile from "jsonfile";
 import { ProcessList } from "./processes/process-list";
-import fs from "fs";
-import path from "path";
-import { withLatestFrom } from "rxjs/operators";
 import { AngularParser } from "./angular/angular.parser";
+import program from 'commander';
+import fs from 'fs';
+import path from 'path';
+import colors from 'colors';
 
-// const defaultpath = "/home/marek/Iridium/Modules/ANG";
+const rimraf = require('rimraf');
 const defaultpath = "C:/Source/Repos/Iridium/Modules/ANG";
-const pckg = jsonfile.readFileSync("./package.json");
 
-let nextitem: string | null, libraries: any, project: any;
+program
+    .name('watch-ng-libraries')
+    .description("CLI to run ng apps using monorepo libraries.")
+    .version('0.0.1')
+    .option('-l, --libraries <lib,lib2,...>', 'List of libraries in chronological order to be used instead of parsed structure')
+    .option('-d, --directory <angular project directory>', 'Working directory of angular project')
+    .option('-p, --detached', 'Run ng serve command in detached window for detailed output.')
+    .option('-r, --delete', 'clean-up ./dist directory in angular project.')
+    .command('serve <project>', { isDefault: true })
+    .description("CLI to run ng apps using monorepo libraries.")
+    .action(runProgram);
 
-new AngularParser(defaultpath);
+if (process.argv.length === 2) {
+    program.outputHelp();
+} else {
+    program.parse(process.argv);
+}
 
-// do {} while (true);
-// process.exit();
-// // parse command-line arguments.
-// process.argv
-//   .filter((a, b) => b > 1)
-//   .forEach((a) => {
-//     if (a.startsWith("-")) {
-//       switch (a.toLowerCase()) {
-//         case "-l":
-//           nextitem = "libraries";
-//           break;
-//         case "-p":
-//           nextitem = "project";
-//           break;
-//         default:
-//           nextitem = null;
-//       }
-//     } else {
-//       if (nextitem === "libraries") {
-//         libraries = eval(a);
-//       }
-//       if (nextitem === "project") {
-//         project = eval(a);
-//       }
-//     }
-//   });
+function runProgram(project: string) {
 
-// console.log("Watch NG Libraries CLI utility, (c) 2020");
+    console.log(program.name());
 
-// if (!Object.keys(pckg.devDependencies).includes("@angular/cli")) {
-//   console.error("Could not find @angular/cli in package.json");
-// } else if ((project || []).length === 0 && (libraries || []).length === 0) {
-//   console.error("There is no project and library to compile specified.");
-// } else {
-//   new ProcessList(libraries || [], project || []);
-// }
+    let dir = __dirname;
+    if (program.directory) { dir = program.directory; }
 
-// do {} while (true);
+    let deps;
+    if (program.delete) {
+        try {
+            rimraf.sync(path.join(dir, 'dist'));
+            console.log(`${path.join(dir, 'dist')} directory deleted.`.red);
+        } catch (err) {
+            console.error(err.Error)
+        }
+    }
+
+
+
+    if (fs.existsSync(path.join(dir, "package.json"))) {
+        const pckg = jsonfile.readFileSync(path.join(dir, "package.json"));
+        if (pckg.devDependencies["@angular/cli"]) {
+            if (program.libraries) {
+                deps = program.libraries.split(',').concat([project]);
+                console.log('skipping processing angular.json'.yellow);
+            } else {
+                deps = new AngularParser(dir).getDependecies(project);
+            }
+        } else {
+            console.warn(`Could not find @angular/cli in package.json in ${dir}`.yellow);
+            process.exit();
+        }
+    } else {
+        console.warn(`Could not find package.json in ${dir}`.yellow);
+        process.exit();
+    }
+
+    new ProcessList(deps.slice(0, -1), deps[deps.length - 1], dir, program.detached);
+}

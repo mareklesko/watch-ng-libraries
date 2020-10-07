@@ -1,13 +1,19 @@
 import { AngularModule } from "./angular.module.parser";
 import path from "path";
 import fs from "fs";
+import { Angular } from "./angular";
+import { AngularParser } from "./angular.parser";
 
 const moduleParser = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gim;
+const regexImportsMl = /(import\ [\s|\S]*?\;|(?=\n.*?;|\z))/gim;
+const regexImports = /(import\ (.*|\n)?\ from\ (.*)?\;+)/gim;
 
 export class AngularProject {
     public Children = new Array<AngularProject>();
     public Parents = new Array<AngularProject>();
     public Modules = new Array<AngularModule>();
+    public Imports = new Array<string>();
+
     constructor(public Name: string, private RootDir: string, private Type: string) {
         this.parseDirContent(RootDir);
         this.sanitize();
@@ -19,9 +25,11 @@ export class AngularProject {
             if (f.isDirectory()) {
                 this.parseDirContent(path.join(dir, f.name));
             } else {
-                if (f.name === '') { debugger; }
-                const ff = fs.readFileSync(path.join(dir, f.name)).toString();
-                this.parseFileContent(ff);
+                const ext = path.extname(path.join(dir, f.name));
+                if (ext === '.ts') {
+                    const ff = fs.readFileSync(path.join(dir, f.name)).toString();
+                    this.parseFileContent(ff);
+                }
             }
         });
     }
@@ -30,7 +38,36 @@ export class AngularProject {
         if (moduleParser.test(body)) {
             this.Modules.push(new AngularModule(body));
         }
+        if (regexImportsMl.test(body)) {
+            const ang = Angular.instance.ang.projects;
+            const imports = new Array<string>();
+            let m;
+            while ((m = regexImportsMl.exec(body)) !== null) {
+                if (m.index === regexImportsMl.lastIndex) {
+                    regexImportsMl.lastIndex++;
+                }
+                if (m[0] != '') {
+                    imports.push(m[0].replace(/\n/gmi, ''));
+                }
+            }
+            imports.forEach(x => {
+                let m;
+                while ((m = regexImports.exec(x)) !== null) {
+                    if (m.index === regexImports.lastIndex) {
+                        regexImports.lastIndex++;
+                    }
+                    if (m[3] != '') {
+                        const name = m[3].replace(/\'/gmi, '');
+                        if (Object.keys(ang).includes(name)) {
+                            this.Imports.push(name);
+                        }
+                    }
+                }
+            })
+        }
     }
+
+
 
     sanitize() {
         this.Modules.forEach(m => {
@@ -42,5 +79,6 @@ export class AngularProject {
                 }
             })
         })
+        this.Imports = this.Imports.filter((item: any, i: any, ar: string | any[]) => ar.indexOf(item) === i);
     }
 }

@@ -1,18 +1,19 @@
 import { fromEvent } from "rxjs";
 import { filter, tap } from 'rxjs/operators';
-import { log } from "../logger/logger";
+import { Logger } from "../logger/logger";
 import { IProcess } from "./process.interface";
 import { ServeProcess } from "./serve-process";
 import { WatchProcess } from "./watch-process";
 
 export class ProcessList extends Array<IProcess>
 {
-    constructor(libraries: Array<string>, projects: Array<string>) {
+    constructor(libraries: Array<string>, project: string, path: string, private detached: boolean) {
         super();
-        libraries.forEach(x => this.push(new WatchProcess(x)));
-        projects.forEach(x => this.push(new ServeProcess(x)));
 
-        this.forEach(s => fromEvent(s.Status, 'Changed').subscribe(d => log(d)));
+        libraries.forEach(x => this.push(new WatchProcess(x, path)));
+        this.push(new ServeProcess(project, path, detached));
+
+        new Logger(this);
 
         this.filter(x => x.Type === 'Watch').forEach((x, index, array) => {
             const s = fromEvent(x.Status, 'Changed');

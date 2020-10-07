@@ -12,9 +12,27 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}/lib/index.js",
+            "args": [
+                "serve",
+                "dash",
+                "-r",
+                "-d",
+                "C:\\Users\\administrator\\Downloads\\watch-ng-libraries"
+            ],
             // "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"
+            ]
+        },
+        {
+            "name": "Launch via npm",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run-script",
+                "debug"
             ]
         }
     ]
