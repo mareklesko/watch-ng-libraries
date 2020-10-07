@@ -10,7 +10,7 @@
         "declaration": true,
         "outDir": "lib",
         "rootDir": "src",
-        "sourceMap": false,
+        "sourceMap": true,
         "strict": true,
         "types": [
             "node"
