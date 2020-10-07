@@ -1,6 +1,6 @@
 {
   "name": "@mareklesko/watch-ng-libraries",
-  "version": "0.9.9-pre1",
+  "version": "1.0.0",
   "description": "CLI to run ng apps using monorepo libraries",
   "main": "./lib/index.js",
   "bin": {
@@ -19,7 +19,11 @@
     "ng",
     "watch",
     "library",
-    "project"
+    "project",
+    "monorepo",
+    "dependencies",
+    "serve",
+    "build"
   ],
   "author": "Marek Lesko",
   "license": "ISC",
