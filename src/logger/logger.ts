@@ -33,10 +33,12 @@ export class Logger {
                 err.name = name;
                 break;
             case 'Recompiling':
+            case 'Building':
             case 'Started':
                 output = colors.yellow(`[${new Date().toLocaleTimeString()}] ${data.Name}: ${data.Event}`);
                 break;
             case 'Compiled':
+            case 'Build':
                 output = colors.green(`[${new Date().toLocaleTimeString()}] ${data.Name}: ${data.Event}`);
                 break;
             default:

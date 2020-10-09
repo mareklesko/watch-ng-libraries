@@ -6,35 +6,36 @@ import tty from 'tty';
 import { BehaviorSubject, Observable } from "rxjs";
 
 const events = [
-    { Event: 'Compiled', Exp: new RegExp('Compiled successfully') },
-    { Event: 'Started', Exp: new RegExp('0\%') },
-    { Event: 'Recompiling', Exp: new RegExp('building') },
+    { Event: 'Build', Exp: new RegExp('Built Angular Package') },
+    { Event: 'Build', Exp: new RegExp('chunk') },
+    { Event: 'Build', Exp: new RegExp('bundle generation complete') },
+    { Event: 'Building', Exp: new RegExp('Building Angular Package') },
     { Event: 'Error', Exp: new RegExp('(ERROR)(.*?)\:(.*)?\:(.*)?\-(.*?)\:(.*)') },
     { Event: 'Warning', Exp: new RegExp('(WARNING)\:(.*?)\:(.*)?\:(.*)?\-(.*?)\:(.*)') }
 ]
 
 
-export class ServeProcess implements IProcess {
+export class BuildProcess implements IProcess {
     public Spawn: childProcess.ChildProcessWithoutNullStreams | undefined;
+    public Type = 'Build';
     public Console = new BehaviorSubject<string>("\r");
-    public Type = 'Serve';
     public Status = new EventEmitter();
     public Port: number | undefined;
 
-    constructor(public Name: string, private Path: string, private Detached: boolean | null) {
+    constructor(public Name: string, private Path: string, private buildOptions: any = []) {
     }
 
     public start(port: number = 0): any {
         this.Port = port;
         this.Spawn = childProcess.spawn(
             'ng',
-            ['serve', this.Name, `--port ${port}`],
-            { detached: this.Detached ? this.Detached : false, cwd: this.Path, shell: true, stdio: 'pipe', }
+            ['build', this.Name, `--prod`].concat(this.buildOptions),
+            { cwd: this.Path, shell: true, stdio: 'pipe', }
         );
         this.Spawn.stdout.on("error", (err) => this.process_status(err));
         this.Spawn.stdout.on("data", (data) => this.process_status(data));
         this.Spawn.stderr.on("data", (data) => this.process_status(data));
-        this.Status.emit("Changed", { Name: this.Name, Event: `Initialized on port ${port}` });
+        this.Status.emit("Changed", { Name: this.Name, Event: `Building` });
         return this;
     }
 

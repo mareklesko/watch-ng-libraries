@@ -1,6 +1,7 @@
 import { EventEmitter } from "events";
 import * as childProcess from "child_process";
 import { IProcess } from "./process.interface";
+import { BehaviorSubject, Observable } from "rxjs";
 
 const events = [
     { Event: 'Compiled', Exp: new RegExp('Compilation complete. Watching for file changes...') },
@@ -12,8 +13,9 @@ const events = [
 
 
 export class WatchProcess implements IProcess {
-    private Spawn: childProcess.ChildProcessWithoutNullStreams | undefined;
+    public Spawn: childProcess.ChildProcessWithoutNullStreams | undefined;
     Type = 'Watch';
+    public Console = new BehaviorSubject<string>("\r");
     public Status = new EventEmitter();
     constructor(public Name: string, private Path: string) {
 
@@ -30,6 +32,7 @@ export class WatchProcess implements IProcess {
 
     private process_status(data: any) {
         const parsedData = data.toString();
+        this.Console.next(parsedData);
         events.forEach(x => {
             if (x.Exp.test(parsedData)) {
                 if (x.Event === 'Error' || x.Event === 'UndefinedError') {
@@ -44,8 +47,6 @@ export class WatchProcess implements IProcess {
                         }
                     }
                     catch { }
-                    // } else if (x.Event === 'UndefinedError') {
-                    //     this.Status.emit('Changed', { Name: this.Name, Event: x.Event, Data: { Message: data.toString() } });
                 } else {
                     this.Status.emit('Changed', { Name: this.Name, Event: x.Event });
                 }
