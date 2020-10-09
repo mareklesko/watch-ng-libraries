@@ -4,9 +4,9 @@ CLI to run ng apps using monorepo libraries. It parses _angular.json_ and looks 
 
 ## Quick Example
 
-    watch-ng-libraries **serve** project -r -d /home/path/to/ang/project -p
+    watch-ng-libraries serve project -r -d /home/path/to/ang/project -p
 
-    watch-ng-libraries **build** project -r -d /home/path/to/ang/project -b --aot,--configuration,ivy
+    watch-ng-libraries build project -r -d /home/path/to/ang/project -b --aot,--configuration,ivy
 
 ### Command **serve**
 
