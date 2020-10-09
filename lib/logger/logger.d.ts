@@ -1,4 +1,4 @@
-import { IProcess } from "../processes/process.interface";
+import { IProcess, IStatus } from "../processes/process.interface";
 export declare class Logger {
     private Items;
     static instance: Logger;
@@ -6,6 +6,6 @@ export declare class Logger {
     private previousError;
     private initialRun;
     constructor(Items: Array<IProcess>);
-    log(name: string, data: any): void;
+    log(name: string, data: IStatus | null): void;
     cleanup(): void;
 }

@@ -2,7 +2,7 @@
 
 import process from "process";
 import jsonfile from "jsonfile";
-import { ProcessList } from "./processes/process-list";
+import { ProcessList } from "./processes/process.list";
 import { AngularParser } from "./angular/angular.parser";
 import program from 'commander';
 import fs from 'fs';
@@ -21,7 +21,7 @@ program
     .option('-p, --detached', 'run ng serve command in detached window for detailed output')
     .option('-r, --delete', 'clean-up ./dist directory in angular project')
     .option('-v, --verbose', 'detailed output from ng compiler')
-    .option('-b, --prod <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
+    .option('-a, --ngccarguments <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
     .command('serve <project>', { isDefault: true })
     .description("CLI to run ng apps using monorepo libraries.")
     .action(runServe);
@@ -30,6 +30,7 @@ program
     .command('build <project>', { isDefault: true })
     .description("Command to build project.")
     .action(runBuild);
+
 
 if (process.argv.length === 2) {
     program.outputHelp();
@@ -54,10 +55,13 @@ function getEnvironment(p: any, project: string) {
     if (fs.existsSync(path.join(dir, "package.json"))) {
         const pckg = jsonfile.readFileSync(path.join(dir, "package.json"));
         if (pckg.devDependencies["@angular/cli"]) {
-            if (p.libraries) {
+            if (p.libraries && p.libraries !== 'false' && p.libraries !== 'none') {
                 deps = p.libraries.split(',').concat([project]);
                 console.log('skipping processing angular.json'.yellow);
-            } else {
+            } else if (p.libraries === 'false' || p.libraries === 'none') {
+                deps = [project];
+            }
+            else {
                 deps = new AngularParser(dir).getDependecies(project);
             }
         } else {
@@ -104,7 +108,7 @@ function runBuild(project: string) {
         dir,
         program.detached,
         true,
-        program.prod ? program.prod.split(',') : [],
+        program.ngccarguments ? (program.ngccarguments.split(',')) : [],
         program.verbose
     );
 }

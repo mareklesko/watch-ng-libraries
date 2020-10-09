@@ -1,10 +1,9 @@
-import { fromEvent } from "rxjs";
-import { filter, tap } from 'rxjs/operators';
+import { filter } from 'rxjs/operators';
 import { Logger } from "../logger/logger";
-import { BuildProcess } from "./build.process";
-import { IProcess } from "./process.interface";
-import { ServeProcess } from "./serve-process";
-import { WatchProcess } from "./watch-process";
+import { BuildProcess } from "./custom-processes/build.process";
+import { IProcess, IStatus, STATUS_DONE, STATUS_ERROR } from "./process.interface";
+import { ServeProcess } from "./custom-processes/serve.process";
+import { WatchProcess } from "./custom-processes/watch.process";
 
 export class ProcessList extends Array<IProcess>
 {
@@ -23,49 +22,53 @@ export class ProcessList extends Array<IProcess>
             this.forEach(x => x.Console.subscribe((data) => console.log(data)))
         }
 
+        this.forEach(x => x.Status.pipe(
+            filter((s: IStatus) => s.Type === STATUS_ERROR)
+        ).subscribe((s: IStatus) => {
+
+        }));
+
         this.filter(x => x.Type === 'Watch').forEach((x, index, array) => {
-            const s = fromEvent(x.Status, 'Changed');
-            const sub = s
+            const sub = x.Status
                 .pipe(
-                    filter((y: any) => y.Event === 'Compiled'),
+                    filter((y: IStatus) => y.Type === STATUS_DONE),
                 )
                 .subscribe(d => {
                     if (array.length - 1 > index) {
-                        array[index + 1].start();
+                        array[index + 1].Start();
                         sub.unsubscribe();
                     }
                 });
 
-            if (index === 0) { x.start(); }
+            if (index === 0) { x.Start(); }
             if (index === array.length - 1) {
-                const sub = s.pipe(
-                    filter((y: any) => y.Event === 'Compiled'),
+                const sub = x.Status.pipe(
+                    filter((y: IStatus) => y.Type === STATUS_DONE),
                 ).subscribe(d => {
-                    this.filter(x => x.Type === 'Serve').forEach((x, index) => x.start(4200 + index));
+                    this.filter(x => x.Type === 'Serve').forEach((x, index) => x.Start(4200 + index));
                     sub.unsubscribe();
                 })
             }
         });
 
         if (this.filter(x => x.Type === 'Watch').length === 0) {
-            this.filter(x => x.Type === 'Serve').forEach((x, index) => x.start(4200 + index));
+            this.filter(x => x.Type === 'Serve')
+                .forEach((x, index) => x.Start(4200 + index));
         }
 
         this.filter(x => x.Type === 'Build').forEach((x, index, array) => {
-            const s = fromEvent(x.Status, 'Changed');
-            const sub = s
+            const sub = x.Status
                 .pipe(
-                    filter((y: any) => y.Event === 'Build'),
+                    filter((y: IStatus) => y.Type === STATUS_DONE),
                 )
                 .subscribe(d => {
                     if (array.length - 1 > index) {
-                        array[index + 1].start();
+                        array[index + 1].Start();
                         sub.unsubscribe();
                     }
                 });
 
-            if (index === 0) { x.start(); }
+            if (index === 0) { x.Start(); }
         });
-
     }
 }

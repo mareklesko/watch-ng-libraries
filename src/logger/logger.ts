@@ -1,5 +1,5 @@
 import { fromEvent } from "rxjs";
-import { IProcess } from "../processes/process.interface";
+import { IEvent, IProcess, IStatus, STATUS_DONE, STATUS_ERROR, STATUS_WARNING, STATUS_WORKING } from "../processes/process.interface";
 import colors from 'colors';
 
 export class Logger {
@@ -10,11 +10,11 @@ export class Logger {
 
     constructor(private Items: Array<IProcess>) {
         Logger.instance = this;
-        Items.forEach(x => fromEvent(x.Status, 'Changed').subscribe(d => this.log(x.Name, d)));
+        Items.forEach(x => x.Status.subscribe(d => this.log(x.Name, d)));
         Items.forEach(x => this.LogObject[x.Name] = colors.white(`[${new Date().toLocaleTimeString()}] ${x.Name} Pending...`));
     }
 
-    log(name: string, data: any) {
+    log(name: string, data: IStatus | null) {
         if (!this.initialRun) {
             this.cleanup();
         } else {
@@ -25,24 +25,21 @@ export class Logger {
         if (this.previousError.name !== name) {
             err = this.previousError;
         }
-        switch (data.Event) {
-            case 'Error':
-            case 'UndefinedError':
-                output = colors.red(`[${new Date().toLocaleTimeString()}] ${data.Name}: ${data.Event}`);
-                err.lines = Object.keys(data.Data).map(x => colors.red(`${x}: ${data.Data[x]}`));
+        switch (data?.Type) {
+            case STATUS_ERROR:
+                output = colors.red(`[${new Date().toLocaleTimeString()}] ${name}: ${data?.Message}`);
+                err.lines = Object.keys(data?.Error).map(x => colors.red(`${x}: ${data.Error[x]}`));
                 err.name = name;
                 break;
-            case 'Recompiling':
-            case 'Building':
-            case 'Started':
-                output = colors.yellow(`[${new Date().toLocaleTimeString()}] ${data.Name}: ${data.Event}`);
+            case STATUS_WORKING:
+            case STATUS_WARNING:
+                output = colors.yellow(`[${new Date().toLocaleTimeString()}] ${name}: ${data.Message}`);
                 break;
-            case 'Compiled':
-            case 'Build':
-                output = colors.green(`[${new Date().toLocaleTimeString()}] ${data.Name}: ${data.Event}`);
+            case STATUS_DONE:
+                output = colors.green(`[${new Date().toLocaleTimeString()}] ${name}: ${data.Message}`);
                 break;
             default:
-                output = colors.white(`[${new Date().toLocaleTimeString()}] ${data.Name}: ${data.Event}`);
+                output = colors.white(`[${new Date().toLocaleTimeString()}] ${name}: ${data?.Message}`);
                 break;
         }
 
