@@ -19,16 +19,17 @@ export class ServeProcess extends ProcessBase {
     ];
     Type = 'Serve';
     Port: number | undefined;
-
-    constructor(public Name: string, private Path: string, private Detached: boolean | null) {
+    private BuildOptions: Array<string>;
+    constructor(public Name: string, private Path: string, private Detached: boolean | null, buildOptions: Array<string> = []) {
         super();
+        this.BuildOptions = buildOptions ? buildOptions : [];
     }
 
     Start(port: number = 0): any {
         this.Port = port;
         this.Spawn = childProcess.spawn(
             'ng',
-            ['serve', this.Name, `--port ${port}`],
+            ['serve', this.Name, `--port ${port}`].concat(this.BuildOptions),
             { detached: this.Detached ? this.Detached : false, cwd: this.Path, shell: true, stdio: 'pipe', }
         );
         this.AttachListeners();

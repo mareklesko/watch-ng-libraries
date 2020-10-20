@@ -16,21 +16,22 @@ program
     .name('watch-ng-libraries')
     .description("CLI to run ng apps using monorepo libraries.")
     .version('0.0.1')
-    .option('-l, --libraries <lib,lib2,...>', 'list of libraries in chronological order to be used instead of parsed structure')
     .option('-d, --directory <angular project directory>', 'working directory of angular project')
+    .option('-l, --libraries <lib,lib2,...>', 'list of libraries in chronological order to be used instead of parsed structure')
     .option('-p, --detached', 'run ng serve command in detached window for detailed output')
     .option('-r, --delete', 'clean-up ./dist directory in angular project')
     .option('-v, --verbose', 'detailed output from ng compiler')
     .option('-a, --ngccarguments <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
+
+program
     .command('serve <project>', { isDefault: true })
-    .description("CLI to run ng apps using monorepo libraries.")
-    .action(runServe);
+    .description("Command to serve project.")
+    .action(runServe)
 
 program
     .command('build <project>', { isDefault: true })
     .description("Command to build project.")
-    .action(runBuild);
-
+    .action(runBuild)
 
 if (process.argv.length === 2) {
     program.outputHelp();
@@ -42,7 +43,7 @@ if (process.argv.length === 2) {
 function getEnvironment(p: any, project: string) {
     let dir = __dirname;
     if (p.directory) { dir = p.directory; }
-
+    console.log(dir);
     let deps;
     if (p.delete) {
         try {
@@ -90,7 +91,7 @@ function runServe(project: string) {
         dir,
         program.detached,
         false,
-        [],
+        program.ngccarguments ? (program.ngccarguments.split(',')) : [],
         program.verbose
     );
 }
