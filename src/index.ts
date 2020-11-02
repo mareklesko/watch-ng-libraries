@@ -4,6 +4,8 @@ import process from "process";
 import jsonfile from "jsonfile";
 import { ProcessList } from "./processes/process.list";
 import { AngularParser } from "./angular/angular.parser";
+import { AngularProject } from "./angular/angular.project";
+
 import program from 'commander';
 import fs from 'fs';
 import path from 'path';
@@ -115,3 +117,5 @@ function runBuild(project: string) {
         program.memory || 2048
     );
 }
+
+module.exports = { AngularParser, AngularProject, ProcessList } 
