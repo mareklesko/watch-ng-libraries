@@ -8,7 +8,7 @@ CLI to run ng apps using monorepo libraries. It parses _angular.json_ and looks 
 
     watch-ng-libraries build project -r -d /home/path/to/ang/project -a --aot,--configuration,ivy
 
-### Command **serve**
+### Command *serve*
 
 #### Parameters
 
@@ -19,8 +19,8 @@ CLI to run ng apps using monorepo libraries. It parses _angular.json_ and looks 
 - **--prod (-b)**: add custom options to _ng build project --prod_
 - **--verbose (-v)**: detailed output from ngcc.
 - **--ngccarguments (-a)**: colon delimited arguments that will be passed to ngcc. E.g *... -a --prod,--configuration,ivy* will be passed as *ng serve project --prod --configuration ivy*
-### Command **build**
 - **--memory (-m)**: set the node memory allocation (--max-old-space-size setting) for app served/build.
+### Command *build*
 
 #### Parameters
 
