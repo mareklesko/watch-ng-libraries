@@ -1,24 +1,19 @@
-import jsonfile from "jsonfile";
 import path from "path";
-import fs from "fs";
 import { AngularModule } from "./angular.module.parser";
 import { AngularProject } from "./angular.project";
 import { Angular } from "./angular";
 
-const regex = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gim;
-const regexBody = /((imports|declarations|bootstrap|entryComponents)\:[\s|\S]*?\[[\s|\S]*?\][\,|\n])/gim;
-const regexImports = /(import\ (.*|\n)?\ from\ (.*)?\;+)/gim;
-const regexImportsMl = /(import[\s|\S]*?\;|(?=\n.*?;|\z))/gim;
-
 export class AngularParser {
   public Modules = new Array<AngularModule>();
   public Projects = new Array<AngularProject>();
+  private Parents = new Array<string>();
 
   constructor(private Path: string) {
     new Angular(Path);
     this.parse(Angular.instance.ang);
     this.sanitize();
     this.createDependecies();
+    this.Projects.forEach(pr => this.getCircularDeps(pr));
   }
 
   sanitize() {
@@ -101,16 +96,33 @@ export class AngularParser {
     })
   }
 
+  getCircularDeps(project: AngularProject | undefined, parsed: Array<string> = [], path: Array<string> = []) {
+    if (!project) { return; }
+    project.Parents
+      .forEach(subproj => {
+        if (path.length > path.filter((v, i, a) => a.indexOf(v) === i).length) {
+          const deps = path.slice(-2);
+          console.log(`Circular dependency found: ` + `${deps[0]} <-> ${deps[1]}`.red);
+          process.exit();
+        }
+        parsed.push(path.concat([subproj.Name || 'empty']).join(':'));
+        this.getCircularDeps(subproj, parsed, path.concat([subproj.Name]));
+      });
+  }
+
   getParent(obj: AngularProject, level: number, levels: any) {
     if (!levels[obj.Name]) {
       levels[obj.Name] = { level };
     }
-    if (levels[obj.Name].level > level) {
+    if (levels[obj.Name].level >= level) {
       levels[obj.Name].level = level;
     }
+
     if (obj.Parents.length > 0) {
       obj.Parents.forEach((p: any) => {
-        this.getParent(p, level - 1, levels);
+        if ((p as AngularProject).Name !== obj.Name) {
+          this.getParent(p, level - 1, levels);
+        }
       });
     }
   }

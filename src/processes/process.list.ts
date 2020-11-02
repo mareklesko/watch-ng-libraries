@@ -7,7 +7,7 @@ import { WatchProcess } from "./custom-processes/watch.process";
 
 export class ProcessList extends Array<IProcess>
 {
-    constructor(libraries: Array<string>, project: string, path: string, detached: boolean, build: boolean, buildOptions: any = [], verbose: boolean) {
+    constructor(libraries: Array<string>, project: string, path: string, detached: boolean, build: boolean, buildOptions: any = [], verbose: boolean, memory: number) {
         super();
         if (build) {
             libraries.forEach(x => this.push(new BuildProcess(x, path)));
@@ -19,7 +19,7 @@ export class ProcessList extends Array<IProcess>
         if (!verbose) {
             new Logger(this);
         } else {
-            this.forEach(x => x.Console.subscribe((data) => console.log(data)))
+            this.forEach(x => x.Console.subscribe((data) => console.log(data.trim())));
         }
 
         this.forEach(x => x.Status.pipe(

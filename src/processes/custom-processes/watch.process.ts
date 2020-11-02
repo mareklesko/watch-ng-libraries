@@ -1,4 +1,3 @@
-import { EventEmitter } from "events";
 import * as childProcess from "child_process";
 import { IProcess, STATUS_DONE, STATUS_ERROR, STATUS_WORKING } from "../process.interface";
 import { BehaviorSubject, Observable } from "rxjs";
@@ -19,8 +18,9 @@ export class WatchProcess extends ProcessBase {
 
     Start(): any {
         this.Spawn = childProcess.spawn(
-            'ng',
-            ['build', this.Name, '--watch'],
+            'node',
+            ['./node_modules/@angular/cli/bin/ng',
+            'build', this.Name, '--watch'],
             { cwd: this.Path, shell: true }
         );
         this.AttachListeners();

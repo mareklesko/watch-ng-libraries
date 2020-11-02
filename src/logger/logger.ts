@@ -47,7 +47,7 @@ export class Logger {
 
         Object.keys(this.LogObject).forEach(key => {
             console.log(
-                this.LogObject[key] + Array(process.stdout.columns - this.LogObject[key].length).fill('').join(' ')
+                this.LogObject[key] + Array(process.stdout.columns - this.LogObject[key].length||0).fill('').join(' ')
             );
         });
         if (err.lines.length > 0) { console.log(err.lines.join('\n\r')); }

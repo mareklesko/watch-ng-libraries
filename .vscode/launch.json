@@ -15,9 +15,10 @@
             "args": [
                 "serve",
                 "dash",
-                "-r",
                 "-d",
-                "C:\\Users\\administrator\\Downloads\\watch-ng-libraries"
+                "C:\\users\\administrator\\sources\\Iridium\\Modules\\Ang",
+                "-m",
+                "4096"
             ],
             // "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [

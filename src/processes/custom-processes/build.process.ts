@@ -16,14 +16,14 @@ export class BuildProcess extends ProcessBase {
     ]
     public Type = 'Build';
 
-    constructor(public Name: string, private Path: string, private buildOptions: any = []) {
+    constructor(public Name: string, private Path: string, private buildOptions: any = [], private Memory: number = 2048) {
         super();
     }
 
     public Start(): IProcess {
         this.Spawn = childProcess.spawn(
-            'ng',
-            ['build', this.Name].concat(this.buildOptions),
+            'node',
+            [`--max-old-space-size=${this.Memory}`, './node_modules/@angular/cli/bin/ng', 'build', this.Name].concat(this.buildOptions),
             { cwd: this.Path, shell: true, stdio: 'pipe', }
         );
         this.AttachListeners();

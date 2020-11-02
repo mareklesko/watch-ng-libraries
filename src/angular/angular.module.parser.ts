@@ -1,8 +1,5 @@
 
 const moduleParser = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gmi;
-const moduleBodyParser = /((imports|declarations|bootstrap|entryComponents)\:[\s|\S]*?\[[\s|\S]*?\][\,|\n])/gim;
-const importParser = /(import\ (.*|\n)?\ from\ (.*)?\;+)/gim;
-const importsMultilineParser = /(import[\s|\S]*?\;|(?=\n.*?;|\z))/gim;
 
 export class AngularModule {
     public Imports = new Array<string>()

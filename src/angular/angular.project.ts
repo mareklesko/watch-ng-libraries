@@ -5,8 +5,8 @@ import { Angular } from "./angular";
 import { AngularParser } from "./angular.parser";
 
 const moduleParser = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gim;
-const regexImportsMl = /(import\ [\s|\S]*?\;|(?=\n.*?;|\z))/gim;
-const regexImports = /(import\ (.*|\n)?\ from\ (.*)?\;+)/gim;
+const regexImportsMl = /^\ *import (.*?)\;/gsm
+const regexImports = /((.*|\n)?\ from\ (.*)?\;+)/gim;
 
 export class AngularProject {
     public Children = new Array<AngularProject>();
@@ -28,43 +28,43 @@ export class AngularProject {
                 const ext = path.extname(path.join(dir, f.name));
                 if (ext === '.ts') {
                     const ff = fs.readFileSync(path.join(dir, f.name)).toString();
-                    this.parseFileContent(ff);
+                    this.parseFileContent(ff, f.name);
                 }
             }
         });
     }
 
-    parseFileContent(body: string) {
+    parseFileContent(body: string, filename: string) {
         if (moduleParser.test(body)) {
             this.Modules.push(new AngularModule(body));
         }
-        if (regexImportsMl.test(body)) {
-            const ang = Angular.instance.ang.projects;
-            const imports = new Array<string>();
+
+        const ang = Angular.instance.ang.projects;
+        const imports = new Array<string>();
+        let m;
+        while ((m = regexImportsMl.exec(body)) !== null) {
+            if (m.index === regexImportsMl.lastIndex) {
+                regexImportsMl.lastIndex++;
+            }
+            if (m[0] != '') {
+                imports.push(m[0].replace(/\n/gmi, ''));
+            }
+        }
+
+        imports.forEach(x => {
             let m;
-            while ((m = regexImportsMl.exec(body)) !== null) {
-                if (m.index === regexImportsMl.lastIndex) {
-                    regexImportsMl.lastIndex++;
+            while ((m = regexImports.exec(x)) !== null) {
+                if (m.index === regexImports.lastIndex) {
+                    regexImports.lastIndex++;
                 }
-                if (m[0] != '') {
-                    imports.push(m[0].replace(/\n/gmi, ''));
+                if (m[3] != '') {
+                    const name = m[3].replace(/\'/gmi, '');
+                    if (Object.keys(ang).includes(name)) {
+                        this.Imports.push(name);
+                    }
                 }
             }
-            imports.forEach(x => {
-                let m;
-                while ((m = regexImports.exec(x)) !== null) {
-                    if (m.index === regexImports.lastIndex) {
-                        regexImports.lastIndex++;
-                    }
-                    if (m[3] != '') {
-                        const name = m[3].replace(/\'/gmi, '');
-                        if (Object.keys(ang).includes(name)) {
-                            this.Imports.push(name);
-                        }
-                    }
-                }
-            })
-        }
+        })
     }
 
 

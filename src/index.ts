@@ -21,6 +21,7 @@ program
     .option('-p, --detached', 'run ng serve command in detached window for detailed output')
     .option('-r, --delete', 'clean-up ./dist directory in angular project')
     .option('-v, --verbose', 'detailed output from ng compiler')
+    .option('-m, --memory <megabytes>', 'set node\'s --max-old-space-size to defined amount for application build. default is 2048MB')
     .option('-a, --ngccarguments <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
 
 program
@@ -43,7 +44,6 @@ if (process.argv.length === 2) {
 function getEnvironment(p: any, project: string) {
     let dir = __dirname;
     if (p.directory) { dir = p.directory; }
-    console.log(dir);
     let deps;
     if (p.delete) {
         try {
@@ -92,7 +92,8 @@ function runServe(project: string) {
         program.detached,
         false,
         program.ngccarguments ? (program.ngccarguments.split(',')) : [],
-        program.verbose
+        program.verbose,
+        program.memory || 2048
     );
 }
 
@@ -110,6 +111,7 @@ function runBuild(project: string) {
         program.detached,
         true,
         program.ngccarguments ? (program.ngccarguments.split(',')) : [],
-        program.verbose
+        program.verbose,
+        program.memory || 2048
     );
 }
