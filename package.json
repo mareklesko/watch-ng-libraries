@@ -1,6 +1,6 @@
 {
   "name": "@mareklesko/watch-ng-libraries",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "description": "CLI to run ng apps using monorepo libraries",
   "main": "./lib/index.js",
   "bin": {
