@@ -31,3 +31,4 @@ CLI to run ng apps using monorepo libraries. It parses _angular.json_ and looks 
 - **--verbose (-v)**: detailed output from ngcc.
 - **--ngccarguments (-a)**: colon delimited arguments that will be passed to ngcc. E.g *... -a --prod,--configuration,ivy* will be passed as *ng build project --prod --configuration ivy*
 - **--memory (-m)**: set the node memory allocation (--max-old-space-size setting) for app served/build.
+- **--omit (-o)**: builds all dependency libraries, but will not build the application. Needed in case when application needs extra build configurations.

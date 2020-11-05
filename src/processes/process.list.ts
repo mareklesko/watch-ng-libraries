@@ -7,11 +7,13 @@ import { WatchProcess } from "./custom-processes/watch.process";
 
 export class ProcessList extends Array<IProcess>
 {
-    constructor(libraries: Array<string>, project: string, path: string, detached: boolean, build: boolean, buildOptions: any = [], verbose: boolean, memory: number) {
+    constructor(libraries: Array<string>, project: string = "", path: string, detached: boolean, build: boolean, buildOptions: any = [], verbose: boolean, memory: number) {
         super();
         if (build) {
             libraries.forEach(x => this.push(new BuildProcess(x, path)));
-            this.push(new BuildProcess(project, path, buildOptions));
+            if (project !== "") {
+                this.push(new BuildProcess(project, path, buildOptions));
+            }
         } else {
             libraries.forEach(x => this.push(new WatchProcess(x, path)));
             this.push(new ServeProcess(project, path, detached));

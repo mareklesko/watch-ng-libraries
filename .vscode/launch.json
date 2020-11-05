@@ -13,13 +13,18 @@
             ],
             "program": "${workspaceFolder}/lib/index.js",
             "args": [
-                "serve",
+                "build",
                 "dash",
-                "-d",
-                "C:\\users\\administrator\\sources\\Iridium\\Modules\\Ang",
-                "-m",
-                "4096"
+                "--omit"
             ],
+            // "args": [
+            //     "serve",
+            //     "dash",
+            //     "-d",
+            //     "C:\\users\\administrator\\sources\\Iridium\\Modules\\Ang",
+            //     "-m",
+            //     "4096"
+            // ],
             // "preLaunchTask": "tsc: build - tsconfig.json",
             "outFiles": [
                 "${workspaceFolder}/lib/**/*.js"

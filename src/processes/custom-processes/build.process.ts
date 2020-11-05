@@ -24,7 +24,7 @@ export class BuildProcess extends ProcessBase {
         this.Spawn = childProcess.spawn(
             'node',
             [`--max-old-space-size=${this.Memory}`, './node_modules/@angular/cli/bin/ng', 'build', this.Name].concat(this.buildOptions),
-            { cwd: this.Path, shell: true, stdio: 'pipe', }
+            { cwd: this.Path, shell: true, stdio: 'pipe' }
         );
         this.AttachListeners();
         return this;

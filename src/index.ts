@@ -18,6 +18,9 @@ program
     .name('watch-ng-libraries')
     .description("CLI to run ng apps using monorepo libraries.")
     .version('0.0.1')
+
+program
+    .command('serve <project>', { isDefault: false })
     .option('-d, --directory <angular project directory>', 'working directory of angular project')
     .option('-l, --libraries <lib,lib2,...>', 'list of libraries in chronological order to be used instead of parsed structure')
     .option('-p, --detached', 'run ng serve command in detached window for detailed output')
@@ -25,14 +28,19 @@ program
     .option('-v, --verbose', 'detailed output from ng compiler')
     .option('-m, --memory <megabytes>', 'set node\'s --max-old-space-size to defined amount for application build. default is 2048MB')
     .option('-a, --ngccarguments <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
-
-program
-    .command('serve <project>', { isDefault: true })
     .description("Command to serve project.")
     .action(runServe)
 
 program
-    .command('build <project>', { isDefault: true })
+    .command('build <project>', { isDefault: false })
+    .option('-d, --directory <angular project directory>', 'working directory of angular project')
+    .option('-l, --libraries <lib,lib2,...>', 'list of libraries in chronological order to be used instead of parsed structure')
+    .option('-p, --detached', 'run ng serve command in detached window for detailed output')
+    .option('-r, --delete', 'clean-up ./dist directory in angular project')
+    .option('-v, --verbose', 'detailed output from ng compiler')
+    .option('-m, --memory <megabytes>', 'set node\'s --max-old-space-size to defined amount for application build. default is 2048MB')
+    .option('-a, --ngccarguments <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
+    .option('-o, --omit', 'all libraries are build except the application. Needed in case when application needs extra build configurations.')
     .description("Command to build project.")
     .action(runBuild)
 
@@ -85,17 +93,20 @@ function runServe(project: string) {
     console.log(program.name());
     console.log(`Serving project ${project}...`);
 
-    const { deps, dir } = getEnvironment(program, project);
+    const command = program.commands.find(x => x.name() === 'serve');
+    if (!command) { process.exit(); }
+
+    const { deps, dir } = getEnvironment(command, project);
 
     new ProcessList(
         deps.slice(0, -1),
         deps[deps.length - 1],
         dir,
-        program.detached,
+        command.detached,
         false,
-        program.ngccarguments ? (program.ngccarguments.split(',')) : [],
-        program.verbose,
-        program.memory || 2048
+        command.ngccarguments ? (command.ngccarguments.split(',')) : [],
+        command.verbose,
+        command.memory || 2048
     );
 }
 
@@ -104,18 +115,19 @@ function runBuild(project: string) {
     console.log(program.name());
     console.log(`Building project ${project}...`);
 
-    const { deps, dir } = getEnvironment(program, project);
+    const command = program.commands.find(x => x.name() === 'build');
+    if (!command) { process.exit(); }
+
+    const { deps, dir } = getEnvironment(command, project);
 
     new ProcessList(
         deps.slice(0, -1),
-        deps[deps.length - 1],
+        command.omit ? "" : deps[deps.length - 1],
         dir,
-        program.detached,
+        command.detached,
         true,
-        program.ngccarguments ? (program.ngccarguments.split(',')) : [],
-        program.verbose,
-        program.memory || 2048
+        command.ngccarguments ? (command.ngccarguments.split(',')) : [],
+        command.verbose,
+        command.memory || 2048
     );
 }
-
-module.exports = { AngularParser, AngularProject, ProcessList } 
