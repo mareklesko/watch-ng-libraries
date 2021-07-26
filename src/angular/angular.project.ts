@@ -61,6 +61,8 @@ export class AngularProject {
                     const name = m[3].replace(/\'/gmi, '');
                     if (Object.keys(ang).includes(name)) {
                         this.Imports.push(name);
+                    } else if (Object.keys(ang).includes(name.split('/')[0])) {
+                        this.Imports.push(name.split('/')[0]);
                     }
                 }
             }
