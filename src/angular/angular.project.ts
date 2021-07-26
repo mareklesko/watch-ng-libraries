@@ -62,11 +62,13 @@ export class AngularProject {
                     if (Object.keys(ang).includes(name)) {
                         this.Imports.push(name);
                     } else if (Object.keys(ang).includes(name.split('/')[0])) {
-                        this.Imports.push(name.split('/')[0]);
+                        if (this.Name !== name.split('/')[0])
+                            this.Imports.push(name.split('/')[0]);
                     }
                 }
             }
         })
+        // console.log(this.Imports);
     }
 
 

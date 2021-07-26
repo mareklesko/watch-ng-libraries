@@ -2,6 +2,7 @@
 
 CLI to run ng apps using monorepo libraries. It parses _angular.json_ and looks for module dependencies among libraries and application within angular monorepo. Then it builds dependecy map and build libraries in correct order to honor all dependecies. **Project** specified in **serve** command is then served using _ng serve_ utilit from **@angular/cli**
 
+> In version 1.2.1 we added support for secondary entry points into ANG libraries support
 ## Quick Example
 
     watch-ng-libraries serve project -r -d /home/path/to/ang/project -p

@@ -14,8 +14,10 @@
             "program": "${workspaceFolder}/lib/index.js",
             "args": [
                 "build",
-                "dash",
-                "--omit"
+                "dash-editor",
+                "-d",
+                "..//repos//Iridium//Modules//ANG",
+                "-o"
             ],
             // "args": [
             //     "serve",
