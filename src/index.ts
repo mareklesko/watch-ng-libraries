@@ -59,7 +59,7 @@ function getEnvironment(p: any, project: string) {
         try {
             rimraf.sync(path.join(dir, 'dist'));
             console.log(`${path.join(dir, 'dist')} directory deleted.`.red);
-        } catch (err) {
+        } catch (err: any) {
             console.error(err.Error)
         }
     }
