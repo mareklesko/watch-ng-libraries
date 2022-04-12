@@ -13,11 +13,11 @@
             ],
             "program": "${workspaceFolder}/lib/index.js",
             "args": [
-                "build",
-                "dash-editor",
-                "-d",
-                "..//repos//Iridium//Modules//ANG",
-                "-o"
+                "trial",
+                // "dash-editor",
+                // "-d",
+                // "..//repos//Iridium//Modules//ANG",
+                // "-o"
             ],
             // "args": [
             //     "serve",

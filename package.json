@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "debug": "node --nolazy ./lib/index.js serve dash"
+    "debug": "node --nolazy ./lib/index.js trial"
   },
   "repository": {
     "type": "git",

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+import util from 'util';
 import process from "process";
 import jsonfile from "jsonfile";
 import { ProcessList } from "./processes/process.list";
@@ -10,6 +10,7 @@ import program from 'commander';
 import fs from 'fs';
 import path from 'path';
 import colors from 'colors';
+import { AngularRepov11 } from "./angular11/angular.repo";
 
 const rimraf = require('rimraf');
 const defaultpath = "C:/Source/Repos/Iridium/Modules/ANG";
@@ -18,6 +19,11 @@ program
     .name('watch-ng-libraries')
     .description("CLI to run ng apps using monorepo libraries.")
     .version('0.0.1')
+
+
+program
+    .command('trial', { isDefault: true })
+    .action(runTrial);
 
 program
     .command('serve <project>', { isDefault: false })
@@ -130,4 +136,11 @@ function runBuild(project: string) {
         command.verbose,
         command.memory || 2048
     );
+}
+
+function runTrial() {
+    const repo = new AngularRepov11('/iridium/Iridium/Modules/ANG');
+    console.warn(util.inspect(repo.FlattenProjects("portal")
+        , { showHidden: false, depth: null, colors: true })
+    )
 }
