@@ -5,7 +5,7 @@ import { Angular } from "./angular";
 import { AngularParser } from "./angular.parser";
 
 const moduleParser = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gim;
-const regexImportsMl = /^\ *import (.*?)\;/gsm
+const regexImportsMl = /^\ *import (.*?)\;/gms;
 const regexImports = /((.*|\n)?\ from\ (.*)?\;+)/gim;
 
 export class AngularProject {
