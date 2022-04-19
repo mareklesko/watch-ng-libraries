@@ -7,6 +7,10 @@ export interface IAngularProject {
     ReferencedProjects: Array<string>;
     References: Array<IAngularProject>;
     Level: number;
+    readonly AllEntryPoints: Array<string>;
+    readonly AllReferencedProjects: Array<string>;
+
+    CreateReferences(projects: IAngularProject[]): void;
 }
 
 export const ModuleParser = /@NgModule\(\{[\s|\S]*imports\:([\s|\S]*?\]\,)[\S|\s]*\}\)[\s|\S]*export class (.*)\{/gmi;

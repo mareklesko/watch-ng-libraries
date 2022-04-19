@@ -79,7 +79,7 @@ function getEnvironment(p: any, project: string) {
                 deps = [project];
             }
             else {
-                deps = new AngularParser(dir).getDependecies(project);
+                deps = [...new AngularRepov11(dir).FlattenProjects(project), project];
             }
         } else {
             console.warn(`Could not find @angular/cli in package.json in ${dir}`.yellow);
@@ -139,8 +139,10 @@ function runBuild(project: string) {
 }
 
 function runTrial() {
-    const repo = new AngularRepov11('/iridium/Iridium/Modules/ANG');
-    console.warn(util.inspect(repo.FlattenProjects("portal")
-        , { showHidden: false, depth: null, colors: true })
+
+    console.warn(util.inspect(
+        {}
+        ,
+        { showHidden: false, depth: null, colors: true })
     )
 }

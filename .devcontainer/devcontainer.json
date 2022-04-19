@@ -16,7 +16,7 @@
 		"dbaeumer.vscode-eslint"
 	],
 	"mounts": [
-		"source=iridium-march-2022,target=/iridium,type=volume,consistency=cached"
+		"source=iridium-march-2022,target=/workspaces/iridium,type=volume,consistency=cached"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],

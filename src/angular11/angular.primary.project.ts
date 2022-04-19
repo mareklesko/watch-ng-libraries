@@ -2,9 +2,8 @@ import fs from "fs";
 import path from 'path';
 
 import { AngularProjectv11Module } from "./angular.module";
-import { IAngularProject, ModuleParser } from "./interfaces/angular.project.interface";
+import { IAngularProject } from "./interfaces/angular.project.interface";
 import { AngularSecondaryProjectv11 } from "./angular.secondary-project";
-import { Crawl } from "./crawler/file.crawler";
 import { AngularProjectv11Base } from "./angular.project";
 
 export class AngularProjectv11 extends AngularProjectv11Base {
@@ -16,6 +15,18 @@ export class AngularProjectv11 extends AngularProjectv11Base {
     public get AllEntryPoints() {
         return [this.Name, ...this.SecondaryEntryPoints.map(x => x.Name)];
     }
+
+    public get AllReferencedProjects() {
+        return [
+            ...this.ReferencedProjects,
+            ...this.SecondaryEntryPoints
+                .map(x => [...x.ReferencedProjects])
+                .reduce((tot, item) => tot = [...tot, ...item], [])
+        ]
+            .filter((value, index, self) => self.indexOf(value) === index)
+            .sort((a, b) => a > b ? 1 : 0);
+    }
+
     public Type: ProjectType;
 
     constructor(_path: string, name: string, configJunk: any) {
@@ -36,10 +47,16 @@ export class AngularProjectv11 extends AngularProjectv11Base {
                 return sp;
             })
         );
+
         this.SecondaryEntryPoints.forEach(ep => {
             ep.ReferencedProjects = ep.ReferencedProjects.filter(x => !this.AllEntryPoints.includes(x))
             this.ReferencedProjects.splice(this.ReferencedProjects.indexOf(ep.Name), 1)
         })
+    }
+
+    CreateReferences(projects: IAngularProject[]): void {
+        this.SecondaryEntryPoints.forEach(x => x.CreateReferences(projects));
+        super.CreateReferences(projects);
     }
 }
 
