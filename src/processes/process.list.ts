@@ -7,7 +7,8 @@ import { WatchProcess } from "./custom-processes/watch.process";
 
 export class ProcessList extends Array<IProcess>
 {
-    constructor(libraries: Array<string>, project: string = "", path: string, detached: boolean, build: boolean, buildOptions: any = [], verbose: boolean, memory: number) {
+    constructor(libraries: Array<string>, project: string = "", path: string, detached: boolean, 
+        build: boolean, buildOptions: any = [], verbose: boolean, memory: number, port: number = 4200) {
         super();
         if (build) {
             libraries.forEach(x => this.push(new BuildProcess(x, path)));
@@ -47,7 +48,7 @@ export class ProcessList extends Array<IProcess>
                 const sub = x.Status.pipe(
                     filter((y: IStatus) => y.Type === STATUS_DONE),
                 ).subscribe(d => {
-                    this.filter(x => x.Type === 'Serve').forEach((x, index) => x.Start(4200 + index));
+                    this.filter(x => x.Type === 'Serve').forEach((x, index) => x.Start(+port + index));
                     sub.unsubscribe();
                 })
             }
@@ -55,7 +56,7 @@ export class ProcessList extends Array<IProcess>
 
         if (this.filter(x => x.Type === 'Watch').length === 0) {
             this.filter(x => x.Type === 'Serve')
-                .forEach((x, index) => x.Start(4200 + index));
+                .forEach((x, index) => x.Start(+port + index));
         }
 
         this.filter(x => x.Type === 'Build').forEach((x, index, array) => {

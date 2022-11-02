@@ -1,6 +1,6 @@
 {
   "name": "@mareklesko/watch-ng-libraries",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "CLI to run ng apps using monorepo libraries",
   "main": "./lib/index.js",
   "bin": {
@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "debug": "node --nolazy ./lib/index.js trial"
+    "debug": "node --nolazy ./lib/index.js trial",
+    "build": "npx tsc --project tsconfig.prod.json"
   },
   "repository": {
     "type": "git",

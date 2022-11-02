@@ -34,6 +34,7 @@ program
     .option('-v, --verbose', 'detailed output from ng compiler')
     .option('-m, --memory <megabytes>', 'set node\'s --max-old-space-size to defined amount for application build. default is 2048MB')
     .option('-a, --ngccarguments <ng_build_option1,ng_build_option2,...>', 'production build with list of ng build options passed to application build')
+    .option('-o, --port <number>', 'port where to serve')
     .description("Command to serve project.")
     .action(runServe)
 
@@ -112,7 +113,8 @@ function runServe(project: string) {
         false,
         command.ngccarguments ? (command.ngccarguments.split(',')) : [],
         command.verbose,
-        command.memory || 2048
+        command.memory || 2048,
+        command.port || 4200
     );
 }
 
@@ -134,7 +136,8 @@ function runBuild(project: string) {
         true,
         command.ngccarguments ? (command.ngccarguments.split(',')) : [],
         command.verbose,
-        command.memory || 2048
+        command.memory || 2048,
+        command.port || 4200
     );
 }
 
